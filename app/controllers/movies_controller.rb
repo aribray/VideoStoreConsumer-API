@@ -23,7 +23,6 @@ class MoviesController < ApplicationController
 
   def create
     movie = Movie.new(movie_params)
-    # movie.available_inventory = movie.inventory
 
     if movie.save
       render json: movie.as_json(only: [:title, :overview, :release_date, :inventory, :image_url, :external_id]),

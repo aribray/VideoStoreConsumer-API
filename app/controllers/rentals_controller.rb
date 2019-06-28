@@ -2,24 +2,17 @@ class RentalsController < ApplicationController
   before_action :require_movie, only: [:check_out, :check_in]
   before_action :require_customer, only: [:check_out, :check_in]
 
-  # TODO: make sure that wave 2 works all the way
   def check_out
 
-    rental = Rental.new(movie: @movie, customer: @customer, due_date: params[:due_date])
-    puts @movie.available_inventory 
-    
-    if @movie.inventory <= 0
-      render status: :bad_request, json: {
-        errors: {
-          rental: "This movie is not in stock"
-        }
-      }
-    end
-    if rental.save
-      render status: :ok, json: {}
+    if @movie.available_inventory.positive?
+      rental = Rental.new(movie: @movie, customer: @customer, due_date: params[:due_date])
+      if rental.save
+        render status: :ok, json: {}
+      end
     else
-      render status: :bad_request, json: { errors: rental.errors.messages }
-    end
+      puts "Didn't work"
+      render status: :bad_request, json: { errors: "This movie is not in stock" }
+    end 
   end
 
   def check_in

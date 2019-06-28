@@ -25,7 +25,7 @@ class MoviesController < ApplicationController
     if !Movie.find_by(external_id: params[:external_id])
       movie = Movie.new(movie_params)
     else
-      render json: { ok: false, message: "#{params[:title]} already exists" },
+      render json: { ok: false, errors: "#{params[:title]} already exists" },
              status: :bad_request
     end
 

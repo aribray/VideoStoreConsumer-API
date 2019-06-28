@@ -4,8 +4,17 @@ class RentalsController < ApplicationController
 
   # TODO: make sure that wave 2 works all the way
   def check_out
-    rental = Rental.new(movie: @movie, customer: @customer, due_date: params[:due_date])
 
+    rental = Rental.new(movie: @movie, customer: @customer, due_date: params[:due_date])
+    puts @movie.available_inventory 
+    
+    if @movie.inventory <= 0
+      render status: :bad_request, json: {
+        errors: {
+          rental: "This movie is not in stock"
+        }
+      }
+    end
     if rental.save
       render status: :ok, json: {}
     else
@@ -49,7 +58,7 @@ private
   def require_movie
     @movie = Movie.find_by title: params[:title]
     unless @movie
-      render status: :not_found, json: { errors: { title: ["No movie with title #{params[:title]}"] } }
+      render status: :not_found, json: { errors: { title: ["No available movie with title #{params[:title]}"] } }
     end
   end
 

@@ -17,12 +17,17 @@ class MoviesController < ApplicationController
       json: @movie.as_json(
         only: [:title, :overview, :release_date, :inventory],
         methods: [:available_inventory],
-      ),
+      )
     )
   end
 
   def create
-    movie = Movie.new(movie_params)
+    if !Movie.find_by(external_id: params[:external_id])
+      movie = Movie.new(movie_params)
+    else
+      render json: { ok: false, errors: "#{params[:title]} already exists" },
+             status: :bad_request
+    end
 
     if movie.save
       render json: movie.as_json(only: [:title, :overview, :release_date, :inventory, :image_url, :external_id]),
